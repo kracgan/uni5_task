@@ -40,18 +40,6 @@ npm start
 ```
 src/
   ├── components/
-  │   ├── cards/
-  │   │   ├── TodayCard.js
-  │   │   ├── AverageHoursCard.js
-  │   │   ├── AverageCheckInCard.js
-  │   │   ├── AttendanceCard.js
-  │   │   ├── OnTimeArrivalCard.js
-  │   │   ├── AverageCheckOutCard.js
-  │   │   └── Card.css
-  │   ├── tables/
-  │   │   ├── MyTeamTable.js
-  │   │   ├── WorkingHistoryTable.js
-  │   │   └── Table.css
   │   ├── Sidebar.js
   │   ├── Sidebar.css
   │   ├── Header.js
