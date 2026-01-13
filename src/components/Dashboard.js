@@ -2,10 +2,17 @@ import React, { useState, useEffect } from "react";
 
 const AttendanceDashboard = () => {
   const [timeLeft, setTimeLeft] = useState({ minutes: 56, seconds: 44 });
+  const [checkinTime, setCheckinTime] = useState({
+    hours: 0,
+    minutes: 0,
+    seconds: 0,
+  });
   const [currentTime, setCurrentTime] = useState(new Date());
   const [windowWidth, setWindowWidth] = useState(
     typeof window !== "undefined" ? window.innerWidth : 1024
   );
+  const [isPresent, setIsPresent] = useState(false);
+  const [isCheckedOut, setIsCheckedOut] = useState(false);
 
   useEffect(() => {
     const handleResize = () => setWindowWidth(window.innerWidth);
@@ -32,6 +39,37 @@ const AttendanceDashboard = () => {
       clearInterval(clockTimer);
     };
   }, []);
+
+  useEffect(() => {
+    let interval;
+    if (isPresent && !isCheckedOut) {
+      interval = setInterval(() => {
+        setCheckinTime((prev) => {
+          let { hours, minutes, seconds } = prev;
+          seconds++;
+          if (seconds === 60) {
+            seconds = 0;
+            minutes++;
+          }
+          if (minutes === 60) {
+            minutes = 0;
+            hours++;
+          }
+          return { hours, minutes, seconds };
+        });
+      }, 1000);
+    }
+    return () => clearInterval(interval);
+  }, [isPresent, isCheckedOut]);
+
+  const handleAttendance = () => {
+    if (!isPresent) {
+      setIsPresent(true);
+      setCheckinTime({ hours: 0, minutes: 0, seconds: 0 });
+    } else {
+      setIsCheckedOut(true);
+    }
+  };
 
   const isMobile = windowWidth < 768;
   const isTablet = windowWidth >= 768 && windowWidth < 1200;
@@ -673,26 +711,67 @@ const AttendanceDashboard = () => {
         <div style={styles.todayCard}>
           <div style={styles.cardHeader}>
             <h3 style={styles.cardTitle}>Today</h3>
-            <span style={styles.badge}>Absent</span>
+            {isPresent ? (
+              <span
+                style={{
+                  ...styles.badge,
+                  backgroundColor: isCheckedOut ? "#FFC107" : "#22c55e",
+                }}
+              >
+                {isCheckedOut ? "Checked Out" : "Present"}
+              </span>
+            ) : (
+              <span style={styles.badge}>Absent</span>
+            )}
           </div>
           <div style={styles.horizontalLine} />
           <div style={styles.todayContent}>
             <div>
               {/* <div style={styles.fingerprintIcon}>👆</div> */}
-              <p style={styles.message}>
-                You have not marked
-                <br />
-                yourself as present today!
-              </p>
-              <div style={styles.timeLeftContainer}>
-                <div style={styles.timeBorder}></div>
-                <span>
-                  Time left :{" "}
-                  <span style={styles.timeLeftValue}>
-                    {timeLeft.minutes}m {timeLeft.seconds}s
-                  </span>
-                </span>
-              </div>
+              {isPresent ? (
+                <>
+                  <p style={styles.message}>
+                    {isCheckedOut
+                      ? "You have checked out!"
+                      : "You are marked present!"}
+                    <br />
+                    Work duration:
+                  </p>
+                  <div style={styles.timeLeftContainer}>
+                    <div
+                      style={{
+                        ...styles.timeBorder,
+                        backgroundColor: "#22c55e",
+                      }}
+                    ></div>
+                    <span>
+                      Duration :{" "}
+                      <span style={styles.timeLeftValue}>
+                        {String(checkinTime.hours).padStart(2, "0")}h{" "}
+                        {String(checkinTime.minutes).padStart(2, "0")}m{" "}
+                        {String(checkinTime.seconds).padStart(2, "0")}s
+                      </span>
+                    </span>
+                  </div>
+                </>
+              ) : (
+                <>
+                  <p style={styles.message}>
+                    You have not marked
+                    <br />
+                    yourself as present today!
+                  </p>
+                  <div style={styles.timeLeftContainer}>
+                    <div style={styles.timeBorder}></div>
+                    <span>
+                      Time left :{" "}
+                      <span style={styles.timeLeftValue}>
+                        {timeLeft.minutes}m {timeLeft.seconds}s
+                      </span>
+                    </span>
+                  </div>
+                </>
+              )}
             </div>
             <div style={styles.progressContainer}>
               <CircularProgress percentage={67} />
@@ -704,7 +783,21 @@ const AttendanceDashboard = () => {
               </div>
             </div>
           </div>
-          <button style={styles.markButton}>Mark Present</button>
+          <button
+            onClick={handleAttendance}
+            style={{
+              ...styles.markButton,
+              backgroundColor: isCheckedOut ? "#9ca3af" : "#3b82f6",
+              cursor: isCheckedOut ? "not-allowed" : "pointer",
+            }}
+            disabled={isCheckedOut}
+          >
+            {!isPresent
+              ? "Mark Present"
+              : !isCheckedOut
+              ? "Check Out"
+              : "Checked Out"}
+          </button>
         </div>
 
         {/* Stats Cards */}
@@ -750,6 +843,7 @@ const AttendanceDashboard = () => {
             </div>
             <p style={styles.statsLabel}>Average check-in</p>
             <p style={styles.statsValue}>10:33 AM</p>
+            <p style={styles.statsValue}>{}</p>
           </div>
           <div style={styles.statsCard}>
             <div

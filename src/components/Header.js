@@ -1,5 +1,5 @@
-import React from 'react';
-import './Header.css';
+import React from "react";
+import "./Header.css";
 
 const Header = () => {
   return (
@@ -10,10 +10,18 @@ const Header = () => {
           {/* <span className="logo-text">LexCorp</span> */}
         </div>
         <nav className="header-nav">
-          <a href="#" className="nav-tab">Dashboard</a>
-          <a href="#" className="nav-tab">Leave</a>
-          <a href="#" className="nav-tab active">Attendance</a>
-          <a href="#" className="nav-tab">Performance</a>
+          <a href="#" className="nav-tab">
+            Dashboard
+          </a>
+          <a href="#" className="nav-tab">
+            Leave
+          </a>
+          <a href="#" className="nav-tab active">
+            Attendance
+          </a>
+          <a href="#" className="nav-tab">
+            Performance
+          </a>
         </nav>
       </div>
       <div className="header-right">
